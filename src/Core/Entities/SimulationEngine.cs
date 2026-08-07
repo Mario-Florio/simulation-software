@@ -7,11 +7,15 @@ public class SimulationEngine
 	private Dictionary<Guid, IState> _simState = new();
 	private int _tick = 0;
 	private ITracer _tracer;
+	private TransformationResolver _transformationResolver;
 
 	public int Tick { get => _tick; }
 
 	public SimulationEngine(ITracer? tracer = null)
-	{ _tracer = tracer ?? new NullTracer(); }
+	{
+		_tracer = tracer ?? new NullTracer();
+		_transformationResolver = new TransformationResolver(_tracer);
+	}
 
 	public void Run(int duration)
 	{

@@ -11,6 +11,7 @@ public class Program
 	private static void _Run(string SuiteName = "")
 	{
 		TransformationTests.Run(SuiteName);
+		TransformationResolverTests.Run(SuiteName);
 	}
 }
 
