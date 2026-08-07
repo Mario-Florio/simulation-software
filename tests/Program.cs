@@ -12,6 +12,7 @@ public class Program
 	{
 		TransformationTests.Run(SuiteName);
 		TransformationResolverTests.Run(SuiteName);
+		SchedulerTests.Run(SuiteName);
 	}
 }
 
