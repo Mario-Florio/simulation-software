@@ -1,2 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using Src.Core.Entities;
+
+var simEngine = new SimulationEngine();
+
+simEngine.Run(10);
+
