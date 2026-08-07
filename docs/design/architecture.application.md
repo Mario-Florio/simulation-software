@@ -45,7 +45,7 @@ Core Simulation Engine logic.
 
 ## Data Management
 
-Storage of simulation results, persistent state, and tranfer across application.
+Storage of simulation results, persistent state, and transfer across application.
 
 Storage may be:
 

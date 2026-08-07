@@ -23,7 +23,7 @@
   1. State is sampled
   2. Transformation functions operate
   3. Mutated state causes downstream transformational effects
-* Each Simulation Agents Production (backup agents excluded) happens once per tick
+* Queued *Simulation Agents Operations* execute once per tick
 
 ---
 

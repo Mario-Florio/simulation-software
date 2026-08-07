@@ -97,7 +97,7 @@ Furthermore, it must be demonstrated that operational modes beyond normal functi
 * Maintenance
 * Logistic support
 
-Such validation requires a significant and complex elaboration of intersystem dynamics. These intersystem dynamics must not only be articulted as a single discrete event, but a series of events which transpire and evolve over time. Furthermore, these unfolding intersystem dynamics must not be demonstrated one time, but many times, across varying scenarios, system configurations, and operational modes. Thus automating such process is deemed appropriate.
+Such validation requires a significant and complex elaboration of intersystem dynamics. These intersystem dynamics must not only be articulated as a single discrete event, but a series of events which transpire and evolve over time. Furthermore, these unfolding intersystem dynamics must not be demonstrated one time, but many times, across varying scenarios, system configurations, and operational modes. Thus automating such process is deemed appropriate.
 
 While simulation is the primary engineering task to be completed, the goal is not merely modeling intersystem dynamics. Rather, the dynamics must be simulated and observed to determine feasibility of design decisions. Thus intersystem dynamics must be interpreted in terms of relevant engineering metrics, including (but not limited too):
 

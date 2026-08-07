@@ -28,7 +28,7 @@ The simulation software is employing a three-tier layered architecture, consisti
 
 * Manage data
 * Execute interactions
-* Progress System
+* Progress system
 * Track events
 
 #### Manage Data
