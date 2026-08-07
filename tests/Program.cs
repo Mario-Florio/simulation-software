@@ -1,4 +1,5 @@
-﻿
+﻿using Tests.Suites;
+
 namespace Tests;
 
 public class Program
@@ -8,6 +9,8 @@ public class Program
 		_Run(string.Join(" ", args));
 	}
 	private static void _Run(string SuiteName = "")
-	{}
+	{
+		TransformationTests.Run(SuiteName);
+	}
 }
 
