@@ -16,6 +16,14 @@ public class SimulationEngine
 	public int Tick { get => _tick; }
 	public IStateContext StateContext { get => (IStateContext)_stateContext; }
 
+	public SimulationEngine(ITracer? tracer = null)
+	{
+		_tracer = tracer ?? new NullTracer();
+		_transformationResolver = new TransformationResolver(_tracer);
+		_scheduler = new Scheduler(_tracer);
+		_stateContext = new StateContext(_simState);
+		_simContext = new SimulationContext(this);
+	}
 	public SimulationEngine(IScheduler? scheduler = null, ITracer? tracer = null)
 	{
 		_tracer = tracer ?? new NullTracer();
