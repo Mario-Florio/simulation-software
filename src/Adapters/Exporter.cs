@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Src.Core.Ports;
 
 namespace Src.Adapters;
@@ -6,6 +7,27 @@ public interface ISpanExporter
 {
 	public void Export(ITracer.ISpan span);
 }
+
+public class NdJsonExporter : ISpanExporter
+{
+	private ISink _sink;
+
+	public NdJsonExporter(ISink? sink = null)
+	{
+		if (sink == null)
+			sink = new FileSink(
+				Path.GetFileNameWithoutExtension(Path.GetRandomFileName()),
+				".ndjson"
+			);
+
+		_sink = sink;
+	}
+
+	public void Export(ITracer.ISpan span)
+	{ _sink.Out($"\n{JsonSerializer.Serialize(span)}\n"); }
+}
+
+
 
 public class ConsoleExporter : ISpanExporter
 {
