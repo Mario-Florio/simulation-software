@@ -1,6 +1,7 @@
 ﻿using Src.Core.Entities;
 using Src.Core.Ports;
 using Src.Adapters;
+using Src.Infra;
 
 namespace Demo;
 
@@ -32,6 +33,8 @@ public class Program
 
 		simEngine.Run(5);
 
+		var nodes = NdJsonParser.Parse(logFile);
+		PrettyPrinter.Print(nodes);
 	}
 
 	private class AgentA : IAgent
