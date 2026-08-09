@@ -12,7 +12,10 @@ public class Program
 
 	public static void Main(string[] args)
 	{
-		var tracer = new SimpleTracer();
+		var logFile = $"sim-trace.{Guid.NewGuid()}.ndjson";
+		var sink = new FileSink(logFile);
+		var exporter = new NdJsonExporter(sink);
+		var tracer = new SimpleTracer(exporter);
 		var simEngine = new SimulationEngine(tracer);
 
 		var variableARef = simEngine.AddState(new Variable("A", 50.0, 0.0, 100.0));
