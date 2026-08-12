@@ -1,3 +1,4 @@
+using System;
 using Src.Core.Entities;
 
 namespace Src.Core.Ports;
@@ -6,11 +7,13 @@ public abstract class Condition
 {
 	public enum ChainType { AND, OR }
 
+	protected Guid _id = Guid.NewGuid();
 	protected ITerm _base;
 	protected ITerm _comparator;
 	protected Condition? _condition;
 	protected ChainType _chainType = ChainType.AND;
 
+	public Guid ID { get => _id; }
 	public ITerm Base { get => _base; }
 	public ITerm Comparator { get => _comparator; }
 	public Condition? condition { get => _condition; }
@@ -45,12 +48,30 @@ public abstract class Condition
 		if (_condition == null) _condition = condition;
 		else _condition.AddCondition(condition);
 	}
+	public Dictionary<string, object> ToDict()
+	{
+		var concreteTypeFullName = GetType().ToString();
+		int lastNamespace = concreteTypeFullName.LastIndexOf('.');
+		var concreteTypeName = (lastNamespace != -1)
+			? concreteTypeFullName.Substring(lastNamespace + 1)
+			: concreteTypeFullName;
+
+		return new Dictionary<string, object>()
+		{
+			["ID"] = _id,
+			["Type (concrete)"] = concreteTypeName,
+			["Base"] = _base.ToString(),
+			["Comparator"] = _comparator.ToString(),
+			["Condition"] = _condition == null ? "null" : _condition.ToDict()
+		};
+	}
 
 	protected abstract bool _Resolve(double baseVal, double comparatorVal);
 
 	public interface ITerm
 	{
 		public double? Resolve(IStateContext stateContext);
+		public string ToString();
 	}
 
 	public class Term : ITerm
@@ -62,6 +83,9 @@ public abstract class Condition
 
 		public double? Resolve(IStateContext stateContext)
 		{ return _val; }
+
+		public override string ToString()
+		{ return _val.ToString(); }
 	}
 	public class ReferenceTerm : ITerm
 	{
@@ -72,6 +96,9 @@ public abstract class Condition
 
 		public double? Resolve(IStateContext stateContext)
 		{ return stateContext.GetValue(_valRef); }
+
+		public override string ToString()
+		{ return _valRef.ToString(); }
 	}
 }
 

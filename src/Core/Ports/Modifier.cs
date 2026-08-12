@@ -1,3 +1,5 @@
+using System;
+
 namespace Src.Core.Entities;
 
 public abstract class Modifier
@@ -43,6 +45,21 @@ public abstract class Modifier
 		if (_modifier == null) _modifier = modifier;
 		else _modifier.AddModifier(modifier);
 		return this;
+	}
+	public Dictionary<string, object> ToDict()
+	{
+		var concreteTypeFullName = GetType().ToString();
+		int lastNamespace = concreteTypeFullName.LastIndexOf('.');
+		var concreteTypeName = (lastNamespace != -1)
+			? concreteTypeFullName.Substring(lastNamespace + 1)
+			: concreteTypeFullName;
+
+		return new Dictionary<string, object>()
+		{
+			["Type (concrete)"] = concreteTypeName,
+			["Value"] = _value == null ? _valueRef! : _value,
+			["Modifier"] = _modifier == null ? "null" : _modifier.ToDict()
+		};
 	}
 
 	protected abstract double _Modify(double baseVal, double modifierVal);

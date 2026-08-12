@@ -22,6 +22,8 @@ public class TransformationResolver
 	) {
 		if (tickSpan == null) tickSpan = _nullSpan;
 
+		var guiltyChanges = new List<Guid>();
+
 		foreach (var (stateRef, change) in transformation.Changes)
 		{
 			if (!stateContext.IsNotNullRef(stateRef)) continue;
@@ -38,7 +40,7 @@ public class TransformationResolver
 				transformation.Status = changeIsValid ?
 					Transformation.StatusState.APPROVED : Transformation.StatusState.REJECTED;
 
-				if (!changeIsValid) break;
+				if (!changeIsValid) guiltyChanges.Add(change.ID);
 			}
 			else if (transformation.Policy.Equals(Transformation.PolicyType.SCALED))
 			{
@@ -47,7 +49,7 @@ public class TransformationResolver
 				if (transformation.Scale == 0.0)
 				{
 					transformation.Status = Transformation.StatusState.REJECTED;
-					break;
+					guiltyChanges.Add(change.ID);
 				}
 				else
 				{ transformation.Status = Transformation.StatusState.APPROVED; }
@@ -57,7 +59,7 @@ public class TransformationResolver
 		tickSpan.AddEvent(
 			transformation.Status == Transformation.StatusState.APPROVED ?
 				"Transformation Approved" : "Transformation Rejected",
-			Transformation.ToDict(transformation)
+				_GetEventDict(transformation.ID, guiltyChanges)
 		);
 	}
 
@@ -73,6 +75,14 @@ public class TransformationResolver
 		if (value + delta > max) return (max - value) / delta;
 		if (value + delta < min) return (min - value) / delta;
 		return 1.0;
+	}
+	private Dictionary<string, object> _GetEventDict(Guid transformationID, List<Guid> guiltyChanges)
+	{
+		return new Dictionary<string, object>()
+		{
+			["Transformation ID"] = transformationID,
+			["Guilty Changes"] = guiltyChanges
+		};
 	}
 }
 
