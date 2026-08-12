@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Src.Core.Ports;
 
 namespace Src.Core.Entities;
@@ -37,9 +38,8 @@ public class SimulationEngine
 	{
 		var simulationSpan = _tracer.StartSpan("Simulation Run");
 
-		var initialState = new Dictionary<string, double>();
-		foreach (var state in _simState.Values) initialState.Add(state.Name, state.Value);
-		simulationSpan.AddAttribute("Initial State", initialState);
+		simulationSpan.AddAttribute("State", new ReadOnlyDictionary<Guid, IState>(_simState));
+		simulationSpan.AddAttribute("Agents", new ReadOnlyDictionary<Guid, IAgent>(_agents));
 
 		for (; _tick < duration; _tick++)
 		{
@@ -47,6 +47,17 @@ public class SimulationEngine
 			var transformations = new List<Transformation>();
 
 			foreach (var agent in _agents.Values) transformations.AddRange(agent.Propose(_simContext));
+
+			tickSpan.AddAttribute(
+				"State Snapshot",
+				_simState.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Value)
+			);
+
+			tickSpan.AddAttribute(
+				"Transformations",
+				transformations.ToDictionary(transformation => transformation.ID,
+							     transformation => transformation.ToDict())
+			);
 
 			_scheduler.Load(transformations);
 			while (_scheduler.Has())
@@ -61,10 +72,6 @@ public class SimulationEngine
 
 			tickSpan.End();
 		}
-
-		var finalState = new Dictionary<string, double>();
-		foreach (var state in _simState.Values) finalState.Add(state.Name, state.Value);
-		simulationSpan.AddAttribute("Final State", finalState);
 
 		simulationSpan.End();
 	}

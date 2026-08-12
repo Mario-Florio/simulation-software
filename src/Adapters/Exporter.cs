@@ -37,7 +37,7 @@ public class ConsoleExporter : ISpanExporter
 	{
 		Console.WriteLine(span.Name);
 		Console.WriteLine($"\tElapsed Time: {span.Elapsed}");
-		foreach (var (name, value) in span.Attributes) Console.WriteLine($"\t{name}: {_PrettyPrint(value, 1)}");
+		foreach (var (name, value) in span.Attributes) Console.WriteLine($"\t{name}: {_PrettyPrint(value, 0)}");
 
 		Console.WriteLine("\tEvents:");
 		foreach (var spanEvent in span.Events)

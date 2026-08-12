@@ -11,19 +11,6 @@ public class Transformation
 	public enum StatusState { APPROVED, REJECTED, PENDING }
 	public enum PolicyType { FIXED, SCALED }
 
-	public static Dictionary<string, object> ToDict(Transformation transformation)
-	{
-		return new Dictionary<string, object>
-		{
-			["ID"] = transformation.ID,
-			["Name"] = transformation.Name,
-			["Status"] = transformation.Status,
-			["Changes"] = transformation.Changes.Values,
-			["Policy"] = transformation.Policy,
-			["Scale"] = transformation.Scale
-		};
-	}
-
 	private Guid _id = Guid.NewGuid();
 	private string _name = "";
 	private Dictionary<Guid, Change> _changes = new();
@@ -53,7 +40,7 @@ public class Transformation
 
 		else
 
-		{ _changes.Add(stateRef, new Change(delta)); }
+		{ _changes.Add(stateRef, new Change(stateRef, delta)); }
 
 		if (modifier != null) _changes[stateRef]!.AddModifier(modifier);
 
@@ -66,7 +53,7 @@ public class Transformation
 
 		else
 
-		{ _changes.Add(stateRef, new Change(deltaRef)); }
+		{ _changes.Add(stateRef, new Change(stateRef, deltaRef)); }
 
 		if (modifier != null) _changes[stateRef]!.AddModifier(modifier);
 
@@ -88,8 +75,7 @@ public class Transformation
 			tickSpan.AddEvent("Transformation Condition Failed", new Dictionary<string, object>()
 			{
 				["Transformation ID"] = _id,
-				["Transformation Name"] = _name,
-				["Condition"] = _condition
+				["Condition ID"] = _condition.ID
 			});
 
 			return;
@@ -113,64 +99,51 @@ public class Transformation
 			tickSpan.AddEvent("Change Executed", new Dictionary<string, object>()
 			{
 				["Transformation ID"] = _id,
-				["Transformation Name"] = _name,
-				["Scale"] = Scale,
-				["Delta (scale applied)"] = _policy == PolicyType.SCALED ? Scale * changeResult : changeResult,
-				["State Changed"] = stateContext.GetName(stateRef!)!,
-				["State Value (after)"] = initialVal!,
-				["State Value (before)"] = stateContext.GetValue(stateRef!)!,
+				["Change Reference"] = stateRef,
+				["Change ID"] = change.ID
 			});
 		}
+	}
+	public Dictionary<string, object> ToDict()
+	{
+		return new Dictionary<string, object>
+		{
+			["ID"] = _id,
+			["Name"] = _name,
+			["Status"] = Status,
+			["Changes"] = _changes.Values.Select(n => n.ToDict()),
+			["Condition"] = _condition == null ? "null" : _condition.ToDict(),
+			["Policy"] = _policy == PolicyType.SCALED ? "Scaled" : "Fixed",
+			["Scale"] = Scale
+		};
 	}
 }
 
 public class Change
 {
-	private static Dictionary<string, object> ToDict(Change change, IStateContext stateContext)
-	{
-		return new Dictionary<string, object>()
-		{
-			["Delta References"] = change.References(stateContext),
-			["Delta (resolved)"] = change.Resolve(stateContext)!
-		};
-	}
-
+	private Guid _id = Guid.NewGuid();
+	private Guid _targetRef;
 	private double? _delta;
 	private List<Guid> _stateRefs = new List<Guid>(); // Alternative source of delta.
 							  // List is used to allow for accumulation of delta refs
 							  // without needing immediate resolution.
 	private Modifier? _modifier = null;
 
+	public Guid ID { get => _id; }
+	public Guid TargetRef { get => _targetRef; }
 	public Modifier? Modifier { get => _modifier; }
 	public double? Delta { get => _delta; }
-	public List<string> References(IStateContext stateContext)
+
+	public Change(Guid targetRef, double delta)
 	{
-		var refs = new List<string>();
-
-		foreach (var stateRef in _stateRefs)
-		{
-			if (stateContext.IsNotNullRef(stateRef)) refs.Add(stateContext.GetName(stateRef)!);
-		}
-
-		return refs;
-	}
-
-	public Change(double delta)
-	{ _delta = delta; }
-
-	public Change(Guid stateRef)
-	{ _stateRefs.Add(stateRef); }
-
-	public Change(double delta, Modifier modifier)
-	{
+		_targetRef = targetRef;
 		_delta = delta;
-		_modifier = modifier;
 	}
 
-	public Change(Guid stateRef, Modifier modifier)
+	public Change(Guid targetRef, Guid stateRef)
 	{
+		_targetRef = targetRef;
 		_stateRefs.Add(stateRef);
-		_modifier = modifier;
 	}
 
 	public double? Resolve(IStateContext stateContext)
@@ -206,6 +179,17 @@ public class Change
 	{
 		if (_modifier == null) _modifier = modifier;
 		else _modifier.AddModifier(modifier);
+	}
+	public Dictionary<string, object> ToDict()
+	{
+		return new Dictionary<string, object>()
+		{
+			["ID"] = _id,
+			["Target Reference"] = _targetRef,
+			["Delta"] = _delta == null ? "null" : _delta,
+			["Delta References"] = _stateRefs,
+			["Modifier"] = _modifier == null ? "null" : _modifier.ToDict()
+		};
 	}
 
 	private double _ResolveMod(double delta, IStateContext stateContext)
