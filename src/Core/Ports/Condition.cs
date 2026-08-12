@@ -8,17 +8,17 @@ public abstract class Condition
 	public enum ChainType { AND, OR }
 
 	protected Guid _id = Guid.NewGuid();
-	protected ITerm _base;
-	protected ITerm _comparator;
+	protected Term _base;
+	protected Term _comparator;
 	protected Condition? _condition;
 	protected ChainType _chainType = ChainType.AND;
 
 	public Guid ID { get => _id; }
-	public ITerm Base { get => _base; }
-	public ITerm Comparator { get => _comparator; }
+	public Term Base { get => _base; }
+	public Term Comparator { get => _comparator; }
 	public Condition? condition { get => _condition; }
 
-	public Condition(ITerm baseVal, ITerm comparator, ChainType chainType = ChainType.AND)
+	public Condition(Term baseVal, Term comparator, ChainType chainType = ChainType.AND)
 	{
 		_base = baseVal;
 		_comparator = comparator;
@@ -60,51 +60,78 @@ public abstract class Condition
 		{
 			["ID"] = _id,
 			["Type (concrete)"] = concreteTypeName,
-			["Base"] = _base.ToString(),
-			["Comparator"] = _comparator.ToString(),
+			["Base"] = _base.ToDict(),
+			["Comparator"] = _comparator.ToDict(),
 			["Condition"] = _condition == null ? "null" : _condition.ToDict()
 		};
 	}
 
 	protected abstract bool _Resolve(double baseVal, double comparatorVal);
 
-	public interface ITerm
+	public abstract class Term
 	{
-		public double? Resolve(IStateContext stateContext);
-		public string ToString();
-	}
+		protected Modifier? _modifier = null;
 
-	public class Term : ITerm
+		public Modifier? Modifier { get => _modifier; }
+
+		public abstract double? Resolve(IStateContext stateContext);
+
+		public Term AddModifier(Modifier modifier)
+		{
+			if (_modifier == null) _modifier = modifier;
+			else _modifier.AddModifier(modifier);
+			return this;
+		}
+
+		public abstract Dictionary<string, object> ToDict();
+	}
+	public class ConstantTerm : Term
 	{
 		private double _val;
 
-		public Term(double val)
+		public ConstantTerm(double val)
 		{ _val = val; }
 
-		public double? Resolve(IStateContext stateContext)
-		{ return _val; }
+		public override double? Resolve(IStateContext stateContext)
+		{ return _modifier == null ? _val : _modifier.Modify(_val, stateContext); }
 
-		public override string ToString()
-		{ return _val.ToString(); }
+		public override Dictionary<string, object> ToDict()
+		{
+			return new Dictionary<string, object>()
+			{
+				["Value"] = _val,
+				["Modifier"] = _modifier == null ? "null" : _modifier.ToDict()
+			};
+		}
 	}
-	public class ReferenceTerm : ITerm
+	public class ReferenceTerm : Term
 	{
 		private Guid _valRef;
 
 		public ReferenceTerm(Guid valRef)
 		{ _valRef = valRef; }
 
-		public double? Resolve(IStateContext stateContext)
-		{ return stateContext.GetValue(_valRef); }
+		public override double? Resolve(IStateContext stateContext)
+		{
+			if (!stateContext.IsNotNullRef(_valRef)) return null;
+			var val = (double)stateContext.GetValue(_valRef)!;
+			return _modifier == null ? val : _modifier.Modify(val, stateContext);
+		}
 
-		public override string ToString()
-		{ return _valRef.ToString(); }
+		public override Dictionary<string, object> ToDict()
+		{
+			return new Dictionary<string, object>()
+			{
+				["Value (reference)"] = _valRef,
+				["Modifier"] = _modifier == null ? "null" : _modifier.ToDict()
+			};
+		}
 	}
 }
 
 public class GreaterThan : Condition
 {
-	public GreaterThan(ITerm baseVal, ITerm comparator, ChainType chainType = ChainType.AND)
+	public GreaterThan(Term baseVal, Term comparator, ChainType chainType = ChainType.AND)
 		: base(baseVal, comparator, chainType)
 	{}
 
@@ -114,7 +141,7 @@ public class GreaterThan : Condition
 
 public class GreaterThanOrEqual : Condition
 {
-	public GreaterThanOrEqual(ITerm baseVal, ITerm comparator, ChainType chainType = ChainType.AND)
+	public GreaterThanOrEqual(Term baseVal, Term comparator, ChainType chainType = ChainType.AND)
 		: base(baseVal, comparator, chainType)
 	{}
 
@@ -125,7 +152,7 @@ public class GreaterThanOrEqual : Condition
 
 public class LesserThan : Condition
 {
-	public LesserThan(ITerm baseVal, ITerm comparator, ChainType chainType = ChainType.AND)
+	public LesserThan(Term baseVal, Term comparator, ChainType chainType = ChainType.AND)
 		: base(baseVal, comparator, chainType)
 	{}
 
