@@ -5,13 +5,11 @@ namespace Src.Adapters;
 
 public class NdJsonParser
 {
-	public static List<JsonNode?> Parse(string fileName)
+	public static List<JsonNode?> Parse(List<string> lines)
 	{
-		if (!File.Exists(fileName)) throw new FileNotFoundException($"File {fileName} not found.");
-
 		var nodes = new List<JsonNode?>();
 
-		foreach (string line in File.ReadLines(fileName))
+		foreach (var line in lines)
 		{
 			if (string.IsNullOrWhiteSpace(line)) continue;
 

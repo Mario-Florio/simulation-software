@@ -33,7 +33,14 @@ public class Program
 
 		simEngine.Run(5);
 
-		var nodes = NdJsonParser.Parse(logFile);
+		var lines = new List<string>();
+		foreach (var line in File.ReadLines(logFile))
+		{
+			if (string.IsNullOrWhiteSpace(line)) continue;
+			lines.Add(line);
+		}
+
+		var nodes = NdJsonParser.Parse(lines);
 		PrettyPrinter.Print(nodes);
 	}
 
