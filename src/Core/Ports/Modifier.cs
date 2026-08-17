@@ -4,33 +4,25 @@ namespace Src.Core.Entities;
 
 public abstract class Modifier
 {
-	protected Guid? _valueRef;
-	protected double? _value;
+	protected Value _val;
 	protected Modifier? _modifier;
 
-	public Modifier(double value)
-	{ _value = value; }
+	public Modifier(Value val)
+	{ _val = val; }
 
-	public Modifier(Guid valueRef)
-	{ _valueRef = valueRef; }
+	public Modifier(double literalVal)
+	{ _val = new Literal(literalVal); }
+
+	public Modifier(Guid reference)
+	{ _val = new Reference(reference); }
 
 	public double? Modify(double baseVal, IStateContext stateContext)
 	{
-		double modifierValue;
+		double? modifierValue = _val.Evaluate(stateContext);
 
-		if (_valueRef != null)
-		{
-			if (!stateContext.IsNotNullRef((Guid)_valueRef!)) return null;
+		if (modifierValue == null) return null;
 
-			modifierValue = (double)stateContext.GetValue((Guid)_valueRef!)!;
-		}
-		else if (_value != null)
-		{ modifierValue = (double)_value!; }
-
-		else
-		{ return null; }
-
-		var result = _Modify(baseVal, modifierValue);
+		var result = _Modify(baseVal, (double)modifierValue);
 
 		if (_modifier != null)
 		{
@@ -57,7 +49,7 @@ public abstract class Modifier
 		return new Dictionary<string, object>()
 		{
 			["Type (concrete)"] = concreteTypeName,
-			["Value"] = _value == null ? _valueRef! : _value,
+			["Value"] = _val.ToDict(),
 			["Modifier"] = _modifier == null ? "null" : _modifier.ToDict()
 		};
 	}
@@ -67,9 +59,11 @@ public abstract class Modifier
 
 public class Multiplier : Modifier
 {
-	public Multiplier(double value) : base(value)
+	public Multiplier(Value val) : base(val)
 	{}
-	public Multiplier(Guid valueRef) : base(valueRef)
+	public Multiplier(double literal) : base(literal)
+	{}
+	public Multiplier(Guid reference) : base(reference)
 	{}
 
 	protected override double _Modify(double baseVal, double modifierVal)
@@ -78,9 +72,11 @@ public class Multiplier : Modifier
 
 public class Divisor : Modifier
 {
-	public Divisor(double value) : base(value)
+	public Divisor(Value val) : base(val)
 	{}
-	public Divisor(Guid valueRef) : base(valueRef)
+	public Divisor(double literal) : base(literal)
+	{}
+	public Divisor(Guid reference) : base(reference)
 	{}
 
 	protected override double _Modify(double baseVal, double modifierVal)
@@ -89,9 +85,11 @@ public class Divisor : Modifier
 
 public class Modulus : Modifier
 {
-	public Modulus(double value) : base(value)
+	public Modulus(Value val) : base(val)
 	{}
-	public Modulus(Guid valueRef) : base(valueRef)
+	public Modulus(double literal) : base(literal)
+	{}
+	public Modulus(Guid reference) : base(reference)
 	{}
 
 	protected override double _Modify(double baseVal, double modifierVal)
@@ -100,9 +98,11 @@ public class Modulus : Modifier
 
 public class Subtractor : Modifier
 {
-	public Subtractor(double value) : base(value)
+	public Subtractor(Value val) : base(val)
 	{}
-	public Subtractor(Guid valueRef) : base(valueRef)
+	public Subtractor(double literal) : base(literal)
+	{}
+	public Subtractor(Guid reference) : base(reference)
 	{}
 
 	protected override double _Modify(double baseVal, double modifierVal)
@@ -111,9 +111,11 @@ public class Subtractor : Modifier
 
 public class Addend : Modifier
 {
-	public Addend(double value) : base(value)
+	public Addend(Value val) : base(val)
 	{}
-	public Addend(Guid valueRef) : base(valueRef)
+	public Addend(double literal) : base(literal)
+	{}
+	public Addend(Guid reference) : base(reference)
 	{}
 
 	protected override double _Modify(double baseVal, double modifierVal)

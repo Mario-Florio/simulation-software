@@ -10,6 +10,7 @@ public class Program
 	}
 	private static void _Run(string SuiteName = "")
 	{
+		ValueTests.Run(SuiteName);
 		TransformationTests.Run(SuiteName);
 		TransformationResolverTests.Run(SuiteName);
 		SchedulerTests.Run(SuiteName);
