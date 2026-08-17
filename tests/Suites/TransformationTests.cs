@@ -275,7 +275,7 @@ public class TransformationTests
 				var delta = 1.0;
 				var transformation = new Transformation()
 					.AddChange(state.ARef, delta)
-					.AddCondition(new GreaterThan(new Condition.ConstantTerm(100.0), new Condition.ConstantTerm(0.0)));
+					.AddCondition(new GreaterThan(new Literal(100.0), new Literal(0.0)));
 
 				transformation.Execute(state.Context);
 
@@ -287,8 +287,8 @@ public class TransformationTests
 				var delta = 1.0;
 				var transformation = new Transformation()
 					.AddChange(state.ARef, delta)
-					.AddCondition(new GreaterThan(new Condition.ConstantTerm(0.00),
-								      new Condition.ConstantTerm(100.0)));
+					.AddCondition(new GreaterThan(new Literal(0.00),
+								      new Literal(100.0)));
 
 				transformation.Execute(state.Context);
 
@@ -300,11 +300,11 @@ public class TransformationTests
 				var delta = 1.0;
 				var transformation = new Transformation()
 					.AddChange(state.ARef, delta)
-					.AddCondition(new GreaterThan(new Condition.ConstantTerm(0.00),
-								      new Condition.ConstantTerm(100.0),
+					.AddCondition(new GreaterThan(new Literal(0.00),
+								      new Literal(100.0),
 								      Condition.ChainType.OR))
-					.AddCondition(new GreaterThan(new Condition.ConstantTerm(100.00),
-								      new Condition.ConstantTerm(0.0)));
+					.AddCondition(new GreaterThan(new Literal(100.00),
+								      new Literal(0.0)));
 
 				transformation.Execute(state.Context);
 
