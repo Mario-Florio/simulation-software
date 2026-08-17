@@ -69,6 +69,20 @@ public class ValueTests
 				TestAPI.Assert(value.Evaluate(state.Context).Equals(state.C % state.A));
 			});
 
+			TestAPI.It("Evaluates Accurately (overloaded operators PEMDAS)", () =>
+			{
+				var value = (new Reference(state.BRef) + state.C) / 100;
+
+				TestAPI.Assert(value.Evaluate(state.Context).Equals((state.B + state.C) / 100));
+			});
+
+			TestAPI.It("Evaluates Accurately (overloaded operators PEMDAS)", () =>
+			{
+				var value = new Reference(state.BRef) + state.C / 100;
+
+				TestAPI.Assert(value.Evaluate(state.Context).Equals(state.B + state.C / 100));
+			});
+
 		});
 	}
 

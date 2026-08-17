@@ -33,31 +33,31 @@ public class Transformation
 		_policy = policy;
 	}
 
-	public Transformation AddChange(Guid stateRef, double delta, Modifier? modifier = null)
+	public Transformation AddChange(Guid stateRef, Value delta)
 	{
 		if (_changes.ContainsKey(stateRef))
 		{ _changes[stateRef].AccumulateDeltas(delta); }
 
 		else
-
 		{ _changes.Add(stateRef, new Change(stateRef, delta)); }
-
-		if (modifier != null) _changes[stateRef]!.AddModifier(modifier);
 
 		return this;
 	}
+	public Transformation AddChange(Guid stateRef, double delta, Modifier? modifier = null)
+	{
+		var value = new Literal(delta);
+
+		if (modifier != null) value.AddModifier(modifier);
+
+		return AddChange(stateRef, value);
+	}
 	public Transformation AddChange(Guid stateRef, Guid deltaRef, Modifier? modifier = null)
 	{
-		if (_changes.ContainsKey(stateRef))
-		{ _changes[stateRef].AccumulateDeltas(deltaRef); }
+		var value = new Reference(deltaRef);
 
-		else
+		if (modifier != null) value.AddModifier(modifier);
 
-		{ _changes.Add(stateRef, new Change(stateRef, deltaRef)); }
-
-		if (modifier != null) _changes[stateRef]!.AddModifier(modifier);
-
-		return this;
+		return AddChange(stateRef, value);
 	}
 	public Transformation AddCondition(Condition condition)
 	{
@@ -123,79 +123,35 @@ public class Change
 {
 	private Guid _id = Guid.NewGuid();
 	private Guid _targetRef;
-	private double? _delta;
-	private List<Guid> _stateRefs = new List<Guid>(); // Alternative source of delta.
-							  // List is used to allow for accumulation of delta refs
-							  // without needing immediate resolution.
-	private Modifier? _modifier = null;
+	private Value _delta;
 
 	public Guid ID { get => _id; }
 	public Guid TargetRef { get => _targetRef; }
-	public Modifier? Modifier { get => _modifier; }
-	public double? Delta { get => _delta; }
+	public Value Delta { get => _delta; }
 
-	public Change(Guid targetRef, double delta)
+	public Change(Guid targetRef, Value delta)
 	{
 		_targetRef = targetRef;
 		_delta = delta;
 	}
 
-	public Change(Guid targetRef, Guid stateRef)
-	{
-		_targetRef = targetRef;
-		_stateRefs.Add(stateRef);
-	}
-
 	public double? Resolve(IStateContext stateContext)
-	{
-		double? result = null;
+	{ return _delta.Evaluate(stateContext); }
 
-		if (_delta != null) result = _ResolveMod((double)_delta!, stateContext);
-
-		if (_stateRefs.Count > 0)
-		{
-
-			foreach (var stateRef in _stateRefs)
-			{
-				if (!stateContext.IsNotNullRef(stateRef)) return result;
-
-				var stateVal = (double)stateContext.GetValue(stateRef)!;
-
-				var delta = result == null ? stateVal : stateVal + (double)result!;
-
-				result = _ResolveMod(delta, stateContext);
-			}
-		}
-
-		return result;
-	}
-	public void AccumulateDeltas(double delta)
-	{ _delta += delta; }
-
-	public void AccumulateDeltas(Guid deltaRef)
-	{ _stateRefs.Add(deltaRef); }
+	public void AccumulateDeltas(Value delta)
+	{ _delta.AddModifier(new Addend(delta)); }
 
 	public void AddModifier(Modifier modifier)
-	{
-		if (_modifier == null) _modifier = modifier;
-		else _modifier.AddModifier(modifier);
-	}
+	{ _delta.AddModifier(modifier); }
+
 	public Dictionary<string, object> ToDict()
 	{
 		return new Dictionary<string, object>()
 		{
 			["ID"] = _id,
 			["Target Reference"] = _targetRef,
-			["Delta"] = _delta == null ? "null" : _delta,
-			["Delta References"] = _stateRefs,
-			["Modifier"] = _modifier == null ? "null" : _modifier.ToDict()
+			["Delta"] = _delta.ToDict()
 		};
-	}
-
-	private double _ResolveMod(double delta, IStateContext stateContext)
-	{
-		var modifierVal = _modifier == null ? null : _modifier.Modify(delta, stateContext);
-		return modifierVal == null ? delta : (double)modifierVal!;
 	}
 }
 
