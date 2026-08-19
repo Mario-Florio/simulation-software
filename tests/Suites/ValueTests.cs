@@ -83,6 +83,88 @@ public class ValueTests
 				TestAPI.Assert(value.Evaluate(state.Context).Equals(state.B + state.C / 100));
 			});
 
+			TestAPI.It("Evaluates Accurately (overloaded operators - operand)", () =>
+			{
+				var value = state.A - new Reference(state.CRef);
+
+				TestAPI.Assert(value.Evaluate(state.Context).Equals(state.A - state.C));
+			});
+
+			TestAPI.It("Evaluates Accurately (overloaded operators - operand)", () =>
+			{
+				var value = state.B + new Reference(state.DRef);
+
+				TestAPI.Assert(value.Evaluate(state.Context).Equals(state.B + state.D));
+			});
+
+			TestAPI.It("Evaluates Accurately (overloaded operators - operand)", () =>
+			{
+				var value = state.A * new Reference(state.CRef);
+
+				TestAPI.Assert(value.Evaluate(state.Context).Equals(state.A * state.C));
+			});
+
+			TestAPI.It("Evaluates Accurately (overloaded operators - operand)", () =>
+			{
+				var value = state.A / new Reference(state.CRef);
+
+				TestAPI.Assert(value.Evaluate(state.Context).Equals(state.A / state.C));
+			});
+
+			TestAPI.It("Evaluates Accurately (overloaded operators - operand)", () =>
+			{
+				var value = state.A % new Reference(state.CRef);
+
+				TestAPI.Assert(value.Evaluate(state.Context).Equals(state.A % state.C));
+			});
+
+			TestAPI.It("Evaluates Accurately (overloaded operators - negates)", () =>
+			{
+				var value = -new Reference(state.CRef);
+
+				TestAPI.Assert(value.Evaluate(state.Context).Equals(-state.C));
+			});
+
+			TestAPI.It("Composes Conditions (overloaded operators - conditions)", () =>
+			{
+				var value = new Reference(state.CRef) > new Literal(state.C);
+
+				TestAPI.Assert(value.GetType().Equals(typeof(GreaterThan)));
+			});
+
+			TestAPI.It("Composes Conditions (overloaded operators - conditions)", () =>
+			{
+				var value = new Reference(state.CRef) >= new Literal(state.C);
+
+				TestAPI.Assert(value.GetType().Equals(typeof(GreaterThanOrEqual)));
+			});
+
+			TestAPI.It("Composes Conditions (overloaded operators - conditions)", () =>
+			{
+				var value = new Reference(state.CRef) < new Literal(state.C);
+
+				TestAPI.Assert(value.GetType().Equals(typeof(LesserThan)));
+			});
+
+			TestAPI.It("Composes Conditions (overloaded operators - conditions)", () =>
+			{
+				var value = new Reference(state.CRef) <= new Literal(state.C);
+
+				TestAPI.Assert(value.GetType().Equals(typeof(LesserThanOrEqual)));
+			});
+			TestAPI.It("Composes Conditions (overloaded operators - conditions)", () =>
+			{
+				var value = new Reference(state.CRef) == new Literal(state.C);
+
+				TestAPI.Assert(value.GetType().Equals(typeof(EqualTo)));
+			});
+
+			TestAPI.It("Composes Conditions (overloaded operators - conditions)", () =>
+			{
+				var value = new Reference(state.CRef) != new Literal(state.C);
+
+				TestAPI.Assert(value.GetType().Equals(typeof(NotEqualTo)));
+			});
 		});
 	}
 
