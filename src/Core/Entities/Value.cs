@@ -60,6 +60,8 @@ public class Literal : Value
 {
 	private double _val;
 
+	public double Value { get => _val; }
+
 	public Literal(double val)
 	{ _val = val; }
 
@@ -82,6 +84,8 @@ public class Literal : Value
 public class Reference : Value
 {
 	private Guid _valRef;
+
+	public Guid Value { get => _valRef; }
 
 	public Reference(Guid valRef)
 	{ _valRef = valRef; }
