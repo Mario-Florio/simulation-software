@@ -8,6 +8,7 @@ public abstract class Value
 
 	public Modifier? Modifier { get => _modifier; }
 
+	public abstract Value Copy();
 	public abstract double? Evaluate(IStateContext stateContext);
 
 	public Value AddModifier(Modifier modifier)
@@ -62,6 +63,9 @@ public class Literal : Value
 	public Literal(double val)
 	{ _val = val; }
 
+	public override Value Copy()
+	{  return new Literal(_val); }
+
 	public override double? Evaluate(IStateContext stateContext)
 	{ return _modifier == null ? _val : _modifier.Modify(_val, stateContext); }
 
@@ -81,6 +85,9 @@ public class Reference : Value
 
 	public Reference(Guid valRef)
 	{ _valRef = valRef; }
+
+	public override Value Copy()
+	{ return new Reference(_valRef); }
 
 	public override double? Evaluate(IStateContext stateContext)
 	{
