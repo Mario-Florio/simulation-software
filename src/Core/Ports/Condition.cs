@@ -120,3 +120,13 @@ public class EqualTo : Condition
 	{ return baseVal == comparatorVal; }
 }
 
+public class NotEqualTo : Condition
+{
+	public NotEqualTo(Value baseVal, Value comparator, ChainType chainType = ChainType.AND)
+		: base(baseVal, comparator, chainType)
+	{}
+
+	protected override bool _Resolve(double baseVal, double comparatorVal)
+	{ return baseVal != comparatorVal; }
+}
+
