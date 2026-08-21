@@ -62,11 +62,27 @@ public abstract class Condition
 			["Type (concrete)"] = concreteTypeName,
 			["Base"] = _base.ID,
 			["Comparator"] = _comparator.ID,
-			["Condition"] = _condition == null ? "null" : _condition.ID
+			["Condition"] = _condition == null ? "null" : _condition.ID,
+			["ChainType"] = _GetChainTypeString(_chainType)
 		};
 	}
 
 	protected abstract bool _Resolve(double baseVal, double comparatorVal);
+
+	protected static string _GetChainTypeString(ChainType type)
+	{
+		switch (type)
+		{
+			case ChainType.AND:
+				return "AND";
+			
+			case ChainType.OR:
+				return "OR";
+
+			default:
+				return "AND";
+		};
+	}
 }
 
 public class GreaterThan : Condition
