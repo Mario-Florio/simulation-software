@@ -4,8 +4,13 @@ namespace Src.Core.Entities;
 
 public abstract class Modifier
 {
+	protected Guid _id = Guid.NewGuid();
 	protected Value _val;
 	protected Modifier? _modifier;
+
+	public Guid ID => _id;
+	public Value Value => _val;
+	public Modifier? Mod => _modifier;
 
 	public Modifier(Value val)
 	{ _val = val; }
@@ -49,8 +54,8 @@ public abstract class Modifier
 		return new Dictionary<string, object>()
 		{
 			["Type (concrete)"] = concreteTypeName,
-			["Value"] = _val.ToDict(),
-			["Modifier"] = _modifier == null ? "null" : _modifier.ToDict()
+			["Value"] = _val.ID,
+			["Modifier"] = _modifier == null ? "null" : _modifier.ID
 		};
 	}
 

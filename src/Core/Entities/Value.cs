@@ -7,8 +7,10 @@ namespace Src.Core.Entities;
 
 public abstract class Value
 {
+	protected Guid _id = Guid.NewGuid();
 	protected Modifier? _modifier = null;
 
+	public Guid ID => _id;
 	public Modifier? Modifier { get => _modifier; }
 
 	public abstract Value Copy();
@@ -119,7 +121,7 @@ public class Literal : Value
 		return new Dictionary<string, object>()
 		{
 			["Value (literal)"] = _val,
-			["Modifier"] = _modifier == null ? "null" : _modifier.ToDict()
+			["Modifier"] = _modifier == null ? "null" : _modifier.ID
 		};
 	}
 }
@@ -148,7 +150,7 @@ public class Reference : Value
 		return new Dictionary<string, object>()
 		{
 			["Value (reference)"] = _valRef,
-			["Modifier"] = _modifier == null ? "null" : _modifier.ToDict()
+			["Modifier"] = _modifier == null ? "null" : _modifier.ID
 		};
 	}
 }
