@@ -16,4 +16,13 @@ public class TraceUtil
 		}
 		return conditions;
 	}
+	public static Dictionary<Guid, object> GetChangesDict(List<Transformation> transformations)
+	{
+		var changes = new Dictionary<Guid, object>();
+		foreach (var t in transformations)
+		{
+			foreach (var c in t.Changes.Values) changes.Add(c.ID, c.ToDict());
+		}
+		return changes;
+	}
 }

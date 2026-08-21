@@ -111,7 +111,7 @@ public class Transformation
 			["ID"] = _id,
 			["Name"] = _name,
 			["Status"] = Status,
-			["Changes"] = _changes.Values.Select(n => n.ToDict()),
+			["Changes"] = _changes.Values.Select(n => n.ID),
 			["Condition"] = _condition == null ? "null" : _condition.ID,
 			["Policy"] = _policy == PolicyType.SCALED ? "Scaled" : "Fixed",
 			["Scale"] = Scale

@@ -60,6 +60,7 @@ public class SimulationEngine
 			);
 
 			tickSpan.AddAttribute("Conditions", TraceUtil.GetConditionsDict(transformations));
+			tickSpan.AddAttribute("Changes", TraceUtil.GetChangesDict(transformations));
 
 			_scheduler.Load(transformations);
 			while (_scheduler.Has())
