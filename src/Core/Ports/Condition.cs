@@ -62,7 +62,7 @@ public abstract class Condition
 			["Type (concrete)"] = concreteTypeName,
 			["Base"] = _base.ToDict(),
 			["Comparator"] = _comparator.ToDict(),
-			["Condition"] = _condition == null ? "null" : _condition.ToDict()
+			["Condition"] = _condition == null ? "null" : _condition.ID
 		};
 	}
 

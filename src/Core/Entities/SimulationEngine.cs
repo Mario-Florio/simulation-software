@@ -59,6 +59,8 @@ public class SimulationEngine
 							     transformation => transformation.ToDict())
 			);
 
+			tickSpan.AddAttribute("Conditions", TraceUtil.GetConditionsDict(transformations));
+
 			_scheduler.Load(transformations);
 			while (_scheduler.Has())
 			{

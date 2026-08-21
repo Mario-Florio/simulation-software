@@ -20,6 +20,7 @@ public class Transformation
 	public Guid ID { get => _id; }
 	public string Name { get => _name; }
 	public ReadOnlyDictionary<Guid, Change> Changes { get => new(_changes); }
+	public Condition? Condition => _condition;
 	public StatusState Status = StatusState.PENDING;
 	public PolicyType Policy { get => _policy; }
 	public double Scale = 1.0;
@@ -99,7 +100,6 @@ public class Transformation
 			tickSpan.AddEvent("Change Executed", new Dictionary<string, object>()
 			{
 				["Transformation ID"] = _id,
-				["Change Reference"] = stateRef,
 				["Change ID"] = change.ID
 			});
 		}
@@ -112,7 +112,7 @@ public class Transformation
 			["Name"] = _name,
 			["Status"] = Status,
 			["Changes"] = _changes.Values.Select(n => n.ToDict()),
-			["Condition"] = _condition == null ? "null" : _condition.ToDict(),
+			["Condition"] = _condition == null ? "null" : _condition.ID,
 			["Policy"] = _policy == PolicyType.SCALED ? "Scaled" : "Fixed",
 			["Scale"] = Scale
 		};
