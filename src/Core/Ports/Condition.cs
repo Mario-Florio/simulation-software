@@ -60,8 +60,8 @@ public abstract class Condition
 		{
 			["ID"] = _id,
 			["Type (concrete)"] = concreteTypeName,
-			["Base"] = _base.ToDict(),
-			["Comparator"] = _comparator.ToDict(),
+			["Base"] = _base.ID,
+			["Comparator"] = _comparator.ID,
 			["Condition"] = _condition == null ? "null" : _condition.ID
 		};
 	}

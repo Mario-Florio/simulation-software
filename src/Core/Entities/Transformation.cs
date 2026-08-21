@@ -150,7 +150,7 @@ public class Change
 		{
 			["ID"] = _id,
 			["Target Reference"] = _targetRef,
-			["Delta"] = _delta.ToDict()
+			["Delta"] = _delta.ID
 		};
 	}
 }
